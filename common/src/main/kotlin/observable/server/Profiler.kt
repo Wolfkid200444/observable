@@ -6,7 +6,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.network.chat.*
 import net.minecraft.resources.ResourceKey
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
@@ -135,14 +134,20 @@ class Profiler {
     }
 
     fun uploadProfile(data: ProfilingData, diagnostics: JsonObject): String? {
+        if (ServerSettings.uploadURL.isEmpty()) {
+            Observable.LOGGER.info("uploadURL not set, skipping upload")
+            return null
+        }
+
         Observable.LOGGER.info("Attempting to upload profile")
         val serialized = Json.encodeToString(DataWithDiagnostics(data, diagnostics))
 
         return try {
-            val conn = URL("https://observable.tas.sh/v1/add").openConnection() as HttpURLConnection
+            val conn = URL(ServerSettings.uploadURL).openConnection() as HttpURLConnection
             conn.requestMethod = "POST"
             conn.doOutput = true
 
+            Observable.LOGGER.info("Writing ${String.format("%.2f", serialized.length / 1000.0)}kb")
             GZIPOutputStream(conn.outputStream).bufferedWriter(Charsets.UTF_8).use {
                 it.write(serialized)
             }

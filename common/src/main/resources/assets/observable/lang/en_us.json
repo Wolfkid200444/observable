@@ -30,5 +30,6 @@
   "text.observable.maxBlockDist": "Max block label distance (blocks):",
   "text.observable.maxEntityDist": "Max entity label distance (blocks):",
   "text.observable.normalize": "Normalize results:",
-  "text.observable.maxEntityCount": "Max # of entities:"
+  "text.observable.maxEntityCount": "Max # of entities:",
+  "text.observable.cmd": "Observable is a server-side entity profiler that can help you figure out what's lagging your server. To learn more, go to %s."
 }

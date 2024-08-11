@@ -1,6 +1,8 @@
 package observable.server
 
+import com.mojang.brigadier.arguments.BoolArgumentType
 import com.mojang.brigadier.arguments.IntegerArgumentType
+import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
 import dev.architectury.utils.GameInstance
 import net.minecraft.commands.CommandSourceStack
@@ -12,15 +14,22 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.phys.Vec3
 import observable.Observable
 import observable.net.S2CPacket
+import observable.util.MOD_URL_COMPONENT
 
 val OBSERVABLE_COMMAND
     get() =
         Commands.literal("observable")
             .requires { it.hasPermission(4) }
-            .executes {
-                it.source.sendSuccess({ Component.literal(ServerSettings.toString()) }, false)
+            .executes { ctx ->
+                ctx.source.sendSuccess({ Component.translatable("text.observable.cmd", MOD_URL_COMPONENT) }, false)
                 1
             }
+            .then(
+                Commands.literal("config").executes { ctx ->
+                    ctx.source.sendSuccess({ Component.literal(ServerSettings.toString()) }, false)
+                    1
+                }
+            )
             .then(
                 Commands.literal("run")
                     .then(
@@ -68,11 +77,16 @@ val OBSERVABLE_COMMAND
             .then(
                 Commands.literal("set").let {
                     ServerSettings::class.java.declaredFields.fold(it) { setCmd, field ->
-                        val argType = TypeMap[field.type] ?: return@fold setCmd
+                        val argType = when (field.type) {
+                            Integer.TYPE -> IntegerArgumentType.integer()
+                            Boolean::class.java -> BoolArgumentType.bool()
+                            String::class.java -> StringArgumentType.string()
+                            else -> return@fold setCmd
+                        }
                         setCmd.then(
                             Commands.literal(field.name)
                                 .then(
-                                    Commands.argument("newVal", argType()).executes { ctx ->
+                                    Commands.argument("newVal", argType).executes { ctx ->
                                         try {
                                             field.isAccessible = true
                                             field.set(
@@ -129,6 +143,12 @@ val OBSERVABLE_COMMAND
                                     )
                             )
                     )
+            )
+            .then(
+                Commands.literal("reset").executes { ctx ->
+                    resetSettings()
+                    1
+                }
             )
 
 fun teleport(ctx: CommandContext<CommandSourceStack>, pos: Vec3) {
