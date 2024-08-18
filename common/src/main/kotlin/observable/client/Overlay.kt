@@ -314,7 +314,7 @@ object Overlay {
     ) {
         poseStack.pushPose()
 
-        Vec3.atLowerCornerOf(entry.pos).subtract(camera.position).apply { poseStack.translate(x, y, z)}
+        Vec3.atLowerCornerOf(entry.pos).subtract(camera.position).apply { poseStack.translate(x, y, z) }
         val mat = poseStack.last().pose()
         entry.color.apply {
             buf.vertex(mat, 0F, 1F, 0F).color(r, g, b, a).endVertex()
