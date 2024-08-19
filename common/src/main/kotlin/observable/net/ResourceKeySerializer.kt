@@ -16,7 +16,7 @@ open class ResourceKeySerializer<T>(val registryKey: ResourceKey<out Registry<T>
     override val descriptor = delegate.descriptor
 
     override fun deserialize(decoder: Decoder): ResourceKey<T> =
-        ResourceKey.create(registryKey, ResourceLocation(delegate.deserialize(decoder)))
+        ResourceKey.create(registryKey, ResourceLocation.parse(delegate.deserialize(decoder)))
 
     override fun serialize(encoder: Encoder, value: ResourceKey<T>) =
         delegate.serialize(encoder, value.location().toString())

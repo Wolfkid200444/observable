@@ -191,12 +191,12 @@ class ProfileScreen : Screen(Component.translatable("screen.observable.profile")
         super.render(graphics, i, j, f)
     }
 
-    override fun mouseScrolled(d: Double, e: Double, f: Double): Boolean {
+    override fun mouseScrolled(d: Double, e: Double, f: Double, g: Double): Boolean {
         (action as? Action.NewProfile)?.apply {
             duration += f.roundToInt() * 5
             duration = this.duration.coerceIn(5, 60)
         }
 
-        return super.mouseScrolled(d, e, f)
+        return super.mouseScrolled(d, e, f, g)
     }
 }

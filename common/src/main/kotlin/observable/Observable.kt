@@ -45,7 +45,7 @@ object Observable {
 
     private val CLIENT_CHAT get() = GameInstance.getClient().gui.chat
 
-    val CHANNEL = BetterChannel(ResourceLocation("channel/observable"))
+    val CHANNEL = BetterChannel(ResourceLocation.fromNamespaceAndPath("observable", "channel"))
     val LOGGER: Logger = LogManager.getLogger("Observable")
     val PROFILER: Profiler by lazy { Profiler() }
     var RESULTS: ProfilingData? = null

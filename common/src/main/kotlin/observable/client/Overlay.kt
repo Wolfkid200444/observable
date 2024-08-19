@@ -247,8 +247,7 @@ object Overlay {
     fun createVBO(camera: Camera) {
         Observable.LOGGER.info("Initializing VBO")
         vertexBuf?.close()
-        val buf = BufferBuilder(renderType.bufferSize() * blocks.size)
-        buf.begin(renderType.mode(), renderType.format())
+        val buf = BufferBuilder(ByteBufferBuilder(renderType.bufferSize() * blocks.size), renderType.mode(), renderType.format())
 
         var stack = PoseStack()
 
@@ -256,7 +255,7 @@ object Overlay {
             drawBlockOutline(entry, stack, camera, buf)
         }
 
-        val rendered = buf.end()
+        val rendered = buf.build() ?: return
         val vbuf = VertexBuffer(VertexBuffer.Usage.DYNAMIC)
         vbuf.bind()
         vbuf.upload(rendered)
@@ -317,35 +316,35 @@ object Overlay {
         Vec3.atLowerCornerOf(entry.pos).subtract(camera.position).apply { poseStack.translate(x, y, z) }
         val mat = poseStack.last().pose()
         entry.color.apply {
-            buf.vertex(mat, 0F, 1F, 0F).color(r, g, b, a).endVertex()
-            buf.vertex(mat, 0F, 1F, 1F).color(r, g, b, a).endVertex()
-            buf.vertex(mat, 1F, 1F, 1F).color(r, g, b, a).endVertex()
-            buf.vertex(mat, 1F, 1F, 0F).color(r, g, b, a).endVertex()
+            buf.addVertex(mat, 0F, 1F, 0F).setColor(r, g, b, a)
+            buf.addVertex(mat, 0F, 1F, 1F).setColor(r, g, b, a)
+            buf.addVertex(mat, 1F, 1F, 1F).setColor(r, g, b, a)
+            buf.addVertex(mat, 1F, 1F, 0F).setColor(r, g, b, a)
 
-            buf.vertex(mat, 0F, 1F, 0F).color(r, g, b, a).endVertex()
-            buf.vertex(mat, 1F, 1F, 0F).color(r, g, b, a).endVertex()
-            buf.vertex(mat, 1F, 0F, 0F).color(r, g, b, a).endVertex()
-            buf.vertex(mat, 0F, 0F, 0F).color(r, g, b, a).endVertex()
+            buf.addVertex(mat, 0F, 1F, 0F).setColor(r, g, b, a)
+            buf.addVertex(mat, 1F, 1F, 0F).setColor(r, g, b, a)
+            buf.addVertex(mat, 1F, 0F, 0F).setColor(r, g, b, a)
+            buf.addVertex(mat, 0F, 0F, 0F).setColor(r, g, b, a)
 
-            buf.vertex(mat, 1F, 1F, 1F).color(r, g, b, a).endVertex()
-            buf.vertex(mat, 0F, 1F, 1F).color(r, g, b, a).endVertex()
-            buf.vertex(mat, 0F, 0F, 1F).color(r, g, b, a).endVertex()
-            buf.vertex(mat, 1F, 0F, 1F).color(r, g, b, a).endVertex()
+            buf.addVertex(mat, 1F, 1F, 1F).setColor(r, g, b, a)
+            buf.addVertex(mat, 0F, 1F, 1F).setColor(r, g, b, a)
+            buf.addVertex(mat, 0F, 0F, 1F).setColor(r, g, b, a)
+            buf.addVertex(mat, 1F, 0F, 1F).setColor(r, g, b, a)
 
-            buf.vertex(mat, 0F, 1F, 1F).color(r, g, b, a).endVertex()
-            buf.vertex(mat, 0F, 1F, 0F).color(r, g, b, a).endVertex()
-            buf.vertex(mat, 0F, 0F, 0F).color(r, g, b, a).endVertex()
-            buf.vertex(mat, 0F, 0F, 1F).color(r, g, b, a).endVertex()
+            buf.addVertex(mat, 0F, 1F, 1F).setColor(r, g, b, a)
+            buf.addVertex(mat, 0F, 1F, 0F).setColor(r, g, b, a)
+            buf.addVertex(mat, 0F, 0F, 0F).setColor(r, g, b, a)
+            buf.addVertex(mat, 0F, 0F, 1F).setColor(r, g, b, a)
 
-            buf.vertex(mat, 1F, 0F, 1F).color(r, g, b, a).endVertex()
-            buf.vertex(mat, 1F, 0F, 0F).color(r, g, b, a).endVertex()
-            buf.vertex(mat, 1F, 1F, 0F).color(r, g, b, a).endVertex()
-            buf.vertex(mat, 1F, 1F, 1F).color(r, g, b, a).endVertex()
+            buf.addVertex(mat, 1F, 0F, 1F).setColor(r, g, b, a)
+            buf.addVertex(mat, 1F, 0F, 0F).setColor(r, g, b, a)
+            buf.addVertex(mat, 1F, 1F, 0F).setColor(r, g, b, a)
+            buf.addVertex(mat, 1F, 1F, 1F).setColor(r, g, b, a)
 
-            buf.vertex(mat, 1F, 0F, 0F).color(r, g, b, a).endVertex()
-            buf.vertex(mat, 1F, 0F, 1F).color(r, g, b, a).endVertex()
-            buf.vertex(mat, 0F, 0F, 1F).color(r, g, b, a).endVertex()
-            buf.vertex(mat, 0F, 0F, 0F).color(r, g, b, a).endVertex()
+            buf.addVertex(mat, 1F, 0F, 0F).setColor(r, g, b, a)
+            buf.addVertex(mat, 1F, 0F, 1F).setColor(r, g, b, a)
+            buf.addVertex(mat, 0F, 0F, 1F).setColor(r, g, b, a)
+            buf.addVertex(mat, 0F, 0F, 0F).setColor(r, g, b, a)
         }
 
         poseStack.popPose()

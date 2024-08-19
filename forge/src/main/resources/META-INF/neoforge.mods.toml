@@ -1,39 +1,33 @@
 modLoader = "javafml"
-loaderVersion = "[35,)"
+loaderVersion = "[1,)"
 issueTrackerURL = "https://github.com/tasgon/observable/issues"
+authors = "tasgon"
 license = "MPL"
 
 [[mods]]
 modId = "observable"
-version = "${version}"
+version = "4.5.1"
 displayName = "Observable"
-authors = "tasgon"
-displayURL = "https://github.com/tasgon/observable"
 description = '''
 See what's lagging your world.
 '''
-#logoFile = ""
-
-[[dependencies.observable]]
-modId = "forge"
-mandatory = true
-versionRange = "[40,)"
-ordering = "NONE"
-side = "BOTH"
-
-[[dependencies.observable]]
-modId = "minecraft"
-mandatory = true
-versionRange = "[1.18.2,)"
-ordering = "NONE"
-side = "BOTH"
 
 [[dependencies.observable]]
 modId = "architectury"
-mandatory = true
-versionRange = "[3.1.45,)"
-ordering = "AFTER"
+type = "required"
+versionRange = "[8,)"
+ordering = "NONE"
 side = "BOTH"
+
+[[dependencies.observable]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.0,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[mixins]]
+config = "observable.common.json"
 
 # [[dependencies.observable]]
 # modId = "kotlinforforge"

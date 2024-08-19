@@ -10,11 +10,10 @@ import net.minecraft.server.level.ServerPlayer
 import org.apache.logging.log4j.LogManager
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.lang.Exception
+import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.function.Supplier
 import java.util.zip.*
-import kotlin.collections.HashMap
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -126,7 +125,7 @@ class BetterChannel(id: ResourceLocation) {
     inline fun <reified T> register(
         noinline consumer: (T, Supplier<NetworkManager.PacketContext>) -> Unit
     ) {
-        LOGGER.info("Registering ${T::class.java}")
+        LOGGER.info("Registering ${T::class.java} as ${UUID.nameUUIDFromBytes(T::class.java.name.toByteArray(StandardCharsets.UTF_8)).toString().replace("-", "")}")
         PartialPacketAssembler.register(consumer)
         rawChannel.register(
             T::class.java,
@@ -137,37 +136,12 @@ class BetterChannel(id: ResourceLocation) {
         LOGGER.info("Registered ${T::class.java}")
     }
 
-    @OptIn(ExperimentalSerializationApi::class)
-    inline fun <reified T> registerCompressed(
-        noinline consumer: (T, Supplier<NetworkManager.PacketContext>) -> Unit
-    ) {
-        LOGGER.info("Registering ${T::class.java}")
-        rawChannel.register(
-            T::class.java,
-            { t, buf ->
-                val bs = ByteArrayOutputStream()
-                val deflater = Deflater()
-                deflater.setLevel(Deflater.BEST_COMPRESSION)
-                val deflaterStream = DeflaterOutputStream(bs, deflater)
-                deflaterStream.write(ProtoBuf.encodeToByteArray(t))
-                deflaterStream.close()
-                buf.writeByteArray(bs.toByteArray())
-            },
-            attempt {
-                val istream = InflaterInputStream(ByteArrayInputStream(it.readByteArray()))
-                ProtoBuf.decodeFromByteArray<T>(istream.readBytes())
-            },
-            validate(consumer)
-        )
-        LOGGER.info("Registered ${T::class.java}")
-    }
-
     fun <T> sendToPlayers(players: List<ServerPlayer>, msg: T) =
         rawChannel.sendToPlayers(players, msg)
 
     fun <T> sendToPlayer(player: ServerPlayer, msg: T) = rawChannel.sendToPlayer(player, msg)
 
-    @OptIn(ExperimentalStdlibApi::class)
+    @OptIn(ExperimentalSerializationApi::class)
     inline fun <reified T> sendToPlayersSplit(players: List<ServerPlayer>, msg: T) {
         val data = ProtoBuf.encodeToByteArray(msg)
         val bs = ByteArrayInputStream(data)
