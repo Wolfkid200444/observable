@@ -60,8 +60,8 @@ object Observable {
 
     @JvmStatic
     fun init() {
-        CHANNEL.register { t: C2SPacket.InitTPSProfile, supplier ->
-            val player = supplier.get().player
+        CHANNEL.register { t: C2SPacket.InitTPSProfile, ctx ->
+            val player = ctx.player
             if (!hasPermission(player)) {
                 LOGGER.info("${player.name.contents} lacks permissions to start profiling")
                 return@register
@@ -72,8 +72,8 @@ object Observable {
             LOGGER.info("${player.gameProfile.name} started profiler for ${t.duration} s")
         }
 
-        CHANNEL.register { _: C2SPacket.RequestAvailability, supplier ->
-            (supplier.get().player as? ServerPlayer)?.let {
+        CHANNEL.register { _: C2SPacket.RequestAvailability, ctx ->
+            (ctx.player as? ServerPlayer)?.let {
                 CHANNEL.sendToPlayer(
                     it,
                     if (hasPermission(it)) {
