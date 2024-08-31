@@ -39,10 +39,10 @@ class BetterChannel(val id: ResourceLocation) {
                 buf.writeByteArray(payload.data)
             }
         }
-        NetworkManager.registerReceiver(NetworkManager.Side.S2C, CustomPacketPayload.Type(s2cLocation), codec, listOf(SplitPacketTransformer())) { value, ctx ->
+        NetworkManager.registerReceiver(Side.S2C, CustomPacketPayload.Type(s2cLocation), codec, listOf(SplitPacketTransformer())) { value, ctx ->
             handlers[value.className]?.invoke(value.data, ctx)
         }
-        NetworkManager.registerReceiver(NetworkManager.Side.C2S, CustomPacketPayload.Type(c2sLocation), codec) { value, ctx ->
+        NetworkManager.registerReceiver(Side.C2S, CustomPacketPayload.Type(c2sLocation), codec) { value, ctx ->
             handlers[value.className]?.invoke(value.data, ctx)
         }
     }
@@ -54,8 +54,8 @@ class BetterChannel(val id: ResourceLocation) {
         LOGGER.info("Registered ${T::class.java}")
     }
 
-    inline fun <reified T> sendToPlayers(players: List<ServerPlayer>, msg: T) = NetworkManager.sendToPlayers(players, createPayload(msg, Side.S2C))
-    inline fun <reified T> sendToPlayer(player: ServerPlayer, msg: T) = NetworkManager.sendToPlayer(player, createPayload(msg, Side.S2C))
-    inline fun <reified T> sendToPlayersSplit(players: List<ServerPlayer>, msg: T) = NetworkManager.sendToPlayers(players, createPayload(msg, Side.S2C))
+    inline fun <reified T> sendToPlayers(players: Iterable<ServerPlayer>, msg: T) = NetworkManager.sendToPlayers(players, createPayload(msg, Side.S2C))
+    inline fun <reified T> sendToPlayer(player: ServerPlayer, msg: T) = sendToPlayers(listOf(player), msg)
+    inline fun <reified T> sendToPlayersSplit(players: Iterable<ServerPlayer>, msg: T) = sendToPlayers(players, msg)
     inline fun <reified T> sendToServer(msg: T) = NetworkManager.sendToServer(createPayload(msg, Side.C2S))
 }

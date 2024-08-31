@@ -180,6 +180,8 @@ class ProfileScreen : Screen(Component.translatable("screen.observable.profile")
     override fun isPauseScreen() = false
 
     override fun render(graphics: GuiGraphics, i: Int, j: Int, f: Float) {
+        super.render(graphics, i, j, f)
+
         graphics.drawCenteredString(
             this.font,
             action.statusMsg,
@@ -187,13 +189,11 @@ class ProfileScreen : Screen(Component.translatable("screen.observable.profile")
             startBtn!!.y - this.font.lineHeight - 4,
             0xFFFFFF
         )
-
-        super.render(graphics, i, j, f)
     }
 
     override fun mouseScrolled(d: Double, e: Double, f: Double, g: Double): Boolean {
         (action as? Action.NewProfile)?.apply {
-            duration += f.roundToInt() * 5
+            duration += g.roundToInt() * 5
             duration = this.duration.coerceIn(5, 60)
         }
 

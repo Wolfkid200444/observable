@@ -223,10 +223,12 @@ object Overlay {
                 drawEntity(entry, poseStack, partialTicks, camera, bufSrc)
             }
 
-            vertexBufPosition.subtract(camera.position).apply { poseStack.translate(x, y, z) }
+            poseStack.mulPose(camera.rotation().invert())
+            vertexBufPosition.subtract(camera.position).apply {
+                poseStack.translate(x, y, z)
+            }
 
             vertexBuf?.let {
-                RenderSystem.setShader { GameRenderer.getPositionColorShader() }
                 it.bind()
                 it.drawWithShader(
                     poseStack.last().pose(),
@@ -287,7 +289,7 @@ object Overlay {
         pos.subtract(camera.position).apply {
             poseStack.translate(x, y + entity.bbHeight + 0.33, z)
             poseStack.mulPose(camera.rotation())
-            poseStack.scale(-0.025F, -0.025F, 0.025F)
+            poseStack.scale(0.025F, -0.025F, 0.025F)
             font.drawInBatch(
                 text,
                 -font.width(text).toFloat() / 2,
@@ -365,7 +367,7 @@ object Overlay {
         Vec3.atCenterOf(pos).subtract(camera.position).apply {
             poseStack.translate(x, y, z)
             poseStack.mulPose(camera.rotation())
-            poseStack.scale(-0.025F, -0.025F, 0.025F)
+            poseStack.scale(0.025F, -0.025F, 0.025F)
             font.drawInBatch(
                 text,
                 -font.width(text).toFloat() / 2,
