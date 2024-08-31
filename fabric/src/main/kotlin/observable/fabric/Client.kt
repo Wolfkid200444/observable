@@ -11,7 +11,8 @@ class Client : ClientModInitializer {
 
         WorldRenderEvents.END.register {
             val stack = it.matrixStack() ?: return@register
-            Overlay.render(stack, it.tickCounter().getGameTimeDeltaPartialTick(true), it.projectionMatrix())
+            val projection = it.projectionMatrix()
+            Overlay.render(stack, it.tickCounter().getGameTimeDeltaPartialTick(true), projection)
         }
     }
 }
