@@ -10,7 +10,8 @@ class Client : ClientModInitializer {
         Observable.clientInit()
 
         WorldRenderEvents.END.register {
-            Overlay.render(it.matrixStack(), it.tickDelta(), it.projectionMatrix())
+            val stack = it.matrixStack() ?: return@register
+            Overlay.render(stack, it.tickCounter().getGameTimeDeltaPartialTick(true), it.projectionMatrix())
         }
     }
 }
