@@ -9,7 +9,7 @@ class Client : ClientModInitializer {
     override fun onInitializeClient() {
         Observable.clientInit()
 
-        WorldRenderEvents.END.register {
+        WorldRenderEvents.LAST.register {
             val stack = it.matrixStack() ?: return@register
             val projection = it.projectionMatrix()
             Overlay.render(stack, it.tickCounter().getGameTimeDeltaPartialTick(true), projection)
