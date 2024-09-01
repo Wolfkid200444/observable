@@ -82,6 +82,8 @@ class ClientSettingsGui : Screen(Component.translatable("screen.observable.clien
     }
 
     override fun render(graphics: GuiGraphics, i: Int, j: Int, f: Float) {
+        super.render(graphics, i, j, f)
+
         for ((field, entry) in fields.zip(this.children())) {
             graphics.drawString(
                 this.font,
@@ -91,7 +93,5 @@ class ClientSettingsGui : Screen(Component.translatable("screen.observable.clien
                 0xFFFFFF
             )
         }
-
-        super.render(graphics, i, j, f)
     }
 }
