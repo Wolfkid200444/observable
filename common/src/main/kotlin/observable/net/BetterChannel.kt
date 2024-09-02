@@ -11,6 +11,10 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 import org.apache.logging.log4j.LogManager
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.util.zip.GZIPInputStream
+import java.util.zip.GZIPOutputStream
 
 @OptIn(ExperimentalSerializationApi::class)
 class BetterChannel(val id: ResourceLocation) {
@@ -31,12 +35,16 @@ class BetterChannel(val id: ResourceLocation) {
     init {
         val codec = object : StreamCodec<RegistryFriendlyByteBuf, SerializedPayload> {
             override fun decode(buf: RegistryFriendlyByteBuf): SerializedPayload {
-                return SerializedPayload(buf.readUtf(), buf.readByteArray(), id)
+                val name = buf.readUtf()
+                val bytes = GZIPInputStream(ByteArrayInputStream(buf.readByteArray())).buffered().use { it.readAllBytes() }
+                return SerializedPayload(name, bytes, id)
             }
 
             override fun encode(buf: RegistryFriendlyByteBuf, payload: SerializedPayload) {
                 buf.writeUtf(payload.className)
-                buf.writeByteArray(payload.data)
+                val bos = ByteArrayOutputStream()
+                GZIPOutputStream(bos).buffered().use { it.write(payload.data) }
+                buf.writeByteArray(bos.toByteArray())
             }
         }
         NetworkManager.registerReceiver(Side.S2C, CustomPacketPayload.Type(s2cLocation), codec, listOf(SplitPacketTransformer())) { value, ctx ->
